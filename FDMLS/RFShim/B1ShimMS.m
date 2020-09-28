@@ -13,24 +13,7 @@
     clear all; clc; close all;
 
     load('b1data.mat');
-
-    %% Load and prepare data
-    B1p0 = B1maps;         % Original, full spatial B1.
-    mask = (abs(sum(B1p0,3))~=0);
-    
-    B1p = B1p0; % dim: [x,y,slice,ch]
-    
-    % medfilt the B1p maps
-    for m = 1:8
-        B1p(:,:,m) = medfilt2(abs(B1p(:,:,m))) .* exp(1i*angle(B1p(:,:,m))) .* mask;
-    end
-    
-    mask = ((abs(sum(B1p,3))~=0) & mask);
-    
-    [Nx,Ny,Nslice,Nc] = size(B1p0);
-      
-    %% clear input
-    clear input m n;
+    [Nx,Ny,Nslice,Nc] = size(B1p);
       
     %% Algorithm Settings
     betaMin = 0.1; % or 0
@@ -57,11 +40,6 @@
     tmp = tmp(:,:).';
     tmp = tmp(logical(mask),:);
     A = bsxfun(@times,exp(-1i*angle(tmp(:,1))),tmp);
-
-    tmp = permute(B1p0,[3 1 2]);
-    tmp = tmp(:,:).';
-    tmp = tmp(logical(mask),:);
-    A0 = bsxfun(@times,exp(-1i*angle(tmp(:,1))),tmp);
     
     % Init RF matrix
     rf1 = zeros(8,betaCtr0);
@@ -86,11 +64,11 @@
         errOut_shim1(betaCtr,:) = err;
     end
         
-    figure(2);
+    figure(1);
     hold on;
     plot(sum(errOut_shim_SAR1,2), sum(errOut_shim_RMSE1,2),'-*');
     hold off;
-    title('RF Shimming');
+    title('L-curves');
     xlabel('RF Power');
     ylabel('FA Accuracy');
     
@@ -101,20 +79,15 @@
 
     rf_out = rf1(:,idxShim);
 
-    % Use CP for empty slices.
     % Adjust the overall flip angle of each slice for the output solution
-    if isempty(A)
-        rf_out = ones(8,1) / mean(abs(A0*ones(8,1)));
-    else
-        rf_out = rf_out / mean(abs(A*rf_out));
-    end
+    rf_out = rf_out / mean(abs(A*rf_out));
     
     % Show Conventional Shim
     tmpRF = abs(rf_out) .* exp(1i*round(angle(rf_out)/pi*180)/180*pi);
         
     tmp = A*tmpRF;
     mcompp2 = embed(tmp,squeeze(mask));
-    figure(1); im(fliplr(mcompp2)); caxis([0,1.2]); colorbar; title('w/o FD');
+    figure(2); im(fliplr(mcompp2)); caxis([0,1.2]); colorbar; title('w/o FD');
         
     %% Null detection
     b1Threshold = 0.15;
@@ -147,7 +120,7 @@
         errOut_shim2(betaCtr,:) = err;
     end
     
-    figure(2);
+    figure(1);
     hold on;
     plot(sum(errOut_shim_SAR2,2), sum(errOut_shim_RMSE2,2),'-*');
     hold off;
@@ -159,18 +132,13 @@
     %% Quad Mode Comparison - scaled fair comparison
     m = A*(ones(8,1)/mean(abs(A*ones(8,1))));
     mcomp = embed(m,squeeze(mask));
-    figure(14); im(fliplr(mcomp)); caxis([0,1.2]); colorbar;
+    figure(4); im(fliplr(mcomp)); caxis([0,1.2]); colorbar; title('Quad');
     
     %% Select Shim Result for export and compare
     rf_out = rf2(:,idxShim);
     
-    % Use CP for empty slices.
     % Adjust the overall flip angle of each slice for the output solution
-    if isempty(A)
-        rf_out = ones(8,1) / mean(abs(A0*ones(8,1)));
-    else
-        rf_out = rf_out / mean(abs(A*rf_out));
-    end
+    rf_out = rf_out / mean(abs(A*rf_out));
     
     %% Shim Mode Comparison    
     tmpRF = abs(rf_out) .* exp(1i*round(angle(rf_out)/pi*180)/180*pi);
@@ -178,4 +146,4 @@
     tmp = A*tmpRF;
     mcompp2 = embed(tmp,squeeze(mask));
 
-    figure(11); im(fliplr(mcompp2)); caxis([0,1.2]); colorbar; title('w/ FD');
+    figure(3); im(fliplr(mcompp2)); caxis([0,1.2]); colorbar; title('w/ FD');

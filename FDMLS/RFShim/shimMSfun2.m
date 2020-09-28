@@ -44,17 +44,10 @@ function [rfOut,errTot,phs,errRMSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFla
                 if fdFlag && itr > 2                      
                     tmp = abs(m);
 
-                    % Case 1: This is against local null
-                    tmp = (tmp<0.08) & (tmp>0);
-                    % if sum(tmp(:)) > 3 % option: against some errs                            
+                    tmp = (tmp<0.08) & (tmp>0);                        
                     if sum(tmp(:))
                         TV = sum(tmp(:)) * TV0 / 0.8;
                     end
-
-                    % Case 2: This is against other local min (rare)
-%                             if std(abs(m)) > 0.18 
-%                                 TV = std(abs(m)) * 3 * TV0 / 0.8;
-%                             end
                 end
 
                 tmpRF = (A'*A+beta(betaCtr)*speye(8)+TV'*TV)\(A'*exp(1i*phs));
