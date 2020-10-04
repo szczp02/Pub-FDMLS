@@ -127,7 +127,7 @@
     title('RF Shimming');
     xlabel('RF Power');
     ylabel('FA Accuracy');
-    legend({'RF Shim MLS','RF Shim MLS-FD'});
+    legend({'RF Shim MLS','RF Shim FD-MLS'});
     
     %% Quad Mode Comparison - scaled fair comparison
     m = A*(ones(8,1)/mean(abs(A*ones(8,1))));
