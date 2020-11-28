@@ -7,8 +7,10 @@ else
 end
 
 function y = D(x)
-Dx = x([2:end,end],:,:) - x;
-Dy = x(:,[2:end,end],:) - x;
+
+Dx = x([1,1:(end-1)],:,:) - x([2:end,end],:,:);
+Dy = x(:,[1,1:(end-1)],:) - x(:,[2:end,end],:);
+
 y = cat(4,Dx,Dy);
 
 function y = adjDx(x)

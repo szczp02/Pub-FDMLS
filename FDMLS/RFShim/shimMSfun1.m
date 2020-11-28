@@ -24,8 +24,8 @@ function [rfOut,errTot,phs,errRMSE,errSAR] = shimMSfun1(A,phs,beta,betaCtr)
             % update the target phase pattern
             phs = angle(m);
 
-            errTmpRMSE(itr) = 1/2*norm(m-exp(1i*phs))^2;
-            errTmpSAR(itr) = 1/2*real(tmpRF'*tmpRF);
+            errTmpRMSE(itr) = norm(abs(m)-1)^2;
+            errTmpSAR(itr) = real(tmpRF'*tmpRF);
             errTmpTot(itr) = errTmpRMSE(itr) + beta(betaCtr) * errTmpSAR(itr);
 
             if (errTmpTot(itr) < 0.99999*errTmpTot(itr-1))

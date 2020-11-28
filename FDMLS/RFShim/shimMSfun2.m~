@@ -27,6 +27,7 @@ function [rfOut,errTot,phs,errRMSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFla
 
                 %%%%%%%%%%%%%%%%%%
 
+                % Method 1:
                 TV0 = (TV0 * (B1p .* mask)) .* mask;
 
                 %%%%%%%%%%%%%%%%%%
@@ -45,12 +46,10 @@ function [rfOut,errTot,phs,errRMSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFla
                     tmp = abs(mtmp);
 
                     tmpIdx = 1+floor(ctrFlag/(maxItr+1)*length(fdThresh));
-                    if tmpIdx > length(fdThresh)
-                        tmpIdx = length(fdThresh);
+                    tmp = (tmp < fdThresh()) & (tmp>0);                       
+                    if sum(tmp(:))
+                        TV = sum(tmp(:)) * TV0 * 10;
                     end
-                    
-                    tmp = (tmp < fdThresh(tmpIdx)) & (tmp>0);                    
-                    TV = sum(tmp(:)) * TV0 * 10;
                 end
 
                 tmpRF = (A'*A+beta(betaCtr)*speye(8)+TV'*TV)\(A'*exp(1i*phs));
