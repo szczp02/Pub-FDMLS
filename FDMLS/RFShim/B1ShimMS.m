@@ -54,22 +54,22 @@
             phs = tmp(mask);
         end
         
-        [tmpRF,err,phs,errRMSE,errSAR] = shimMSfun1(A,phs,beta,betaCtr);
+        [tmpRF,err,phs,errSE,errSAR] = shimMSfun1(A,phs,beta,betaCtr);
         
         rf1(:,betaCtr) = tmpRF;
         
-        errOut_shim_RMSE1(betaCtr,:) = errRMSE;
+        errOut_shim_RMSE1(betaCtr,:) = sqrt(errSE/Nv);
         errOut_shim_SAR1(betaCtr,:) = errSAR;
         errOut_shim1(betaCtr,:) = err;
     end
         
     figure(1);
     hold on;
-    plot(errOut_shim_SAR1, sqrt(errOut_shim_RMSE1/Nv)*100,'-*');
+    plot(errOut_shim_SAR1, errOut_shim_RMSE1*100,'-*');
     hold off;
     title('L-curves');
-    xlabel('RF Power (a.u.)');
-    ylabel('FA NRMSE (% of target FA)');
+    xlabel('RF Power [a.u.]');
+    ylabel('FA NRMSE [% of Target FA]');
     
     %% Evaluate Shim Result and Redo Slices with FD Regularization
     
@@ -109,22 +109,22 @@
             phs = tmp(mask);
         end
 
-        [tmpRF,err,phs,errRMSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFlag,0.01,2,mask,B1p);
+        [tmpRF,err,phs,errSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFlag,0.4,10,mask,B1p);
         
         rf2(:,betaCtr) = tmpRF;
         
-        errOut_shim_RMSE2(betaCtr,:) = errRMSE;
+        errOut_shim_RMSE2(betaCtr,:) = sqrt(errSE/Nv);
         errOut_shim_SAR2(betaCtr,:) = errSAR;
         errOut_shim2(betaCtr,:) = err;
     end
     
     figure(1);
     hold on;
-    plot(errOut_shim_SAR2, sqrt(errOut_shim_RMSE2/Nv)*100,'-*');
+    plot(errOut_shim_SAR2, errOut_shim_RMSE2*100,'-*');
     hold off;
     title('RF Shimming');
-    xlabel('RF Power (a.u.)');
-    ylabel('FA NRMSE (% of target FA)');
+    xlabel('RF Power [a.u.]');
+    ylabel('FA NRMSE [% of Target FA]');
     legend({'MLS','FD-MLS'});
     
     %% Quad Mode Comparison - scaled fair comparison
