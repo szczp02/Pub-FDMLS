@@ -1,11 +1,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     2D MS RF Shimming Code
+%     2D RF Shimming Code
 %
 %     Zhipeng Cao, Ph.D
-%     Vanderbilt University Medical Center, 2020.11.27
+%     Vanderbilt University Medical Center, 2021.02.01
 % 
 %     Note:
-%     1) It needs Fessler's Image Recon Toolbox for results display.
+%     1) It needs Fessler's Image Recon Toolbox
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     clear all; clc; close all;
@@ -86,13 +86,13 @@
     
     tmp = A*rf_out;
     mcomp = embed(tmp,squeeze(mask));
-    figure(2); im(fliplr(mcomp)); caxis([0,1.2]); colorbar; title('w/o FD');
-%     figure(21); im(fliplr(angle(mcomp))); colorbar; title('w/o FD');
+    figure(2); im(fliplr(mcomp)); caxis([0,1.2]); colorbar; title('MLS');
+%     figure(21); im(fliplr(angle(mcomp))); colorbar; title('MLS');
         
     %% Null detection
 
     % This can be done better with adv image processing
-    b1Threshold = 0.15;
+    b1Threshold = 0.2;
     if ~isempty(A)
         tmpM = abs(A*rf_out);
         fdFlag = (sum((tmpM<b1Threshold) & (tmpM>0))>1);
@@ -109,7 +109,7 @@
             phs = tmp(mask);
         end
 
-        [tmpRF,err,phs,errSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFlag,0.4,10,mask,B1p);
+        [tmpRF,err,phs,errSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFlag,0.08,20,mask,B1p);
         
         rf2(:,betaCtr) = tmpRF;
         
@@ -136,14 +136,8 @@
     %% Select Shim Result for export and compare
     rf_out = rf2(:,idxShim);
     
-    % Adjust the overall flip angle of each slice for the output solution
-    rf_out = rf_out / mean(abs(A*rf_out));
-    
-    % Normalize by the 1st channel shim phase.
-    rf_out = rf_out .* exp(-1i*angle(rf_out(1,:)));
-    
     tmp = A*rf_out;
     mcomp = embed(tmp,squeeze(mask));
 
-    figure(3); im(fliplr(mcomp)); caxis([0,1.2]); colorbar; title('w/ FD');
-%     figure(31); im(fliplr(angle(mcomp))); colorbar; title('w/ FD');
+    figure(3); im(fliplr(mcomp)); caxis([0,1.2]); colorbar; title('FD-MLS');
+%     figure(31); im(fliplr(angle(mcomp))); colorbar; title('FD-MLS');

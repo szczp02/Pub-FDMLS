@@ -18,6 +18,9 @@ function [rfOut,errTot,phs,errRMSE,errSAR] = shimMSfun1(A,phs,beta,betaCtr)
 
             tmpRF = (A'*A+beta(betaCtr)*speye(8))\(A'*exp(1i*phs));
 
+            tmpRF = tmpRF / mean(abs(A*tmpRF));
+            tmpRF = tmpRF * exp(-1i*angle(tmpRF(1)));
+            
             % calculate the excitation pattern
             m = A*tmpRF;
 

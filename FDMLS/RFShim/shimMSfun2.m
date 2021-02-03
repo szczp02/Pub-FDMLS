@@ -1,6 +1,14 @@
 function [rfOut,errTot,phs,errRMSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFlag,faThresh,maxItr,mask,B1p)
 
-        % MS Shim Optimization
+        if maxItr == 1
+            fdThresh = faThresh;
+            maxItr = 20;
+        else
+            minThresh = 0;
+            faIncr = (faThresh-minThresh) / (maxItr-1); 
+            fdThresh = faThresh : -faIncr : minThresh;
+        end
+        
         if isempty(A)
             rfOut = zeros(8,1); % if empty slice, dont calculate in cost.
             errTot(idx) = 0;
@@ -23,11 +31,11 @@ function [rfOut,errTot,phs,errRMSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFla
             if fdFlag                   
                 % Use TV to avoid nulls
                 TV0 = FD;
-                ctrFlag = 0;
+                ctrFlag = 1;
 
                 %%%%%%%%%%%%%%%%%%
 
-                TV0 = (TV0 * (B1p .* mask)) .* mask;
+                TV0 = TV0 * (B1p .* mask);
 
                 %%%%%%%%%%%%%%%%%%
 
@@ -44,17 +52,23 @@ function [rfOut,errTot,phs,errRMSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFla
                 if fdFlag && itr > 2                      
                     tmp = abs(mtmp);
 
-                    tmpIdx = 1+floor(ctrFlag/(maxItr+1)*length(fdThresh));
-                    if tmpIdx > length(fdThresh)
-                        tmpIdx = length(fdThresh);
-                    end
-                    
-                    tmp = (tmp < fdThresh(tmpIdx)) & (tmp>0);                    
-                    TV = sum(tmp(:)) * TV0 * 10;
+                    % Important
+                    if length(fdThresh) == 1
+                        % optimized
+                        tmp = (tmp < fdThresh) & (tmp>0);
+                        TV = sum(tmp(:)) * TV0 / 0.8;
+                    else
+                        % general recommended
+                        tmp = (tmp < fdThresh(ctrFlag)) & (tmp>0);
+                        TV = sqrt( 10 * sum(tmp(:)) ) * TV0;
+                    end    
                 end
 
                 tmpRF = (A'*A+beta(betaCtr)*speye(8)+TV'*TV)\(A'*exp(1i*phs));
 
+                tmpRF = tmpRF / mean(abs(A*tmpRF));
+                tmpRF = tmpRF * exp(-1i*angle(tmpRF(1)));
+            
                 % calculate the excitation pattern
                 mtmp = A*tmpRF;
 
