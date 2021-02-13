@@ -109,7 +109,8 @@
             phs = tmp(mask);
         end
 
-        [tmpRF,err,phs,errSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFlag,0.08,20,mask,B1p);
+%         [tmpRF,err,phs,errSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFlag,0.08,1,mask,B1p);
+        [tmpRF,err,phs,errSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFlag,0.15,100,mask,B1p);
         
         rf2(:,betaCtr) = tmpRF;
         

@@ -16,8 +16,6 @@ function [rfOut,errTot,phs,errRMSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFla
             errSAR(idx) = 0;
 
         else
-
-            fdThresh = faThresh : -0.01 : 0;
             
             errTmpTot = [];
             errTmpRMSE = [];
@@ -56,11 +54,11 @@ function [rfOut,errTot,phs,errRMSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFla
                     if length(fdThresh) == 1
                         % optimized
                         tmp = (tmp < fdThresh) & (tmp>0);
-                        TV = sum(tmp(:)) * TV0 / 0.8;
+                        TV = sqrt( 1.5 * sqrt(sum(tmp(:))) ) * TV0;
                     else
                         % general recommended
                         tmp = (tmp < fdThresh(ctrFlag)) & (tmp>0);
-                        TV = sqrt( 10 * sum(tmp(:)) ) * TV0;
+                        TV = sqrt( 10 * sqrt(sum(tmp(:))) ) * TV0;
                     end    
                 end
 
