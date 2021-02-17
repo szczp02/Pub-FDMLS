@@ -65,7 +65,7 @@
         
     figure(1);
     hold on;
-    plot(errOut_shim_SAR1, errOut_shim_RMSE1*100,'-*');
+    plot(errOut_shim_SAR1, errOut_shim_RMSE1*100,'r-*');
     hold off;
     title('L-curves');
     xlabel('RF Power [a.u.]');
@@ -110,7 +110,7 @@
         end
 
 %         [tmpRF,err,phs,errSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFlag,0.08,1,mask,B1p);
-        [tmpRF,err,phs,errSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFlag,0.15,100,mask,B1p);
+        [tmpRF,err,phs,errSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFlag,0.20,150,mask,B1p);
         
         rf2(:,betaCtr) = tmpRF;
         
@@ -121,7 +121,7 @@
     
     figure(1);
     hold on;
-    plot(errOut_shim_SAR2, errOut_shim_RMSE2*100,'-*');
+    plot(errOut_shim_SAR2, errOut_shim_RMSE2*100,'b-*');
     hold off;
     title('RF Shimming');
     xlabel('RF Power [a.u.]');
