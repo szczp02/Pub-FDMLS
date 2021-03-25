@@ -79,10 +79,9 @@
     rf_out = rf1(:,idxShim);
 
     % Adjust the overall flip angle of each slice for the output solution
-    rf_out = rf_out / mean(abs(A*rf_out));
-        
+    rf_out = rf_out / mean(abs(A*rf_out));        
     % Normalize by the 1st channel shim phase.
-    rf_out = rf_out .* exp(-1i*angle(rf_out(1,:)));
+    rf_out = rf_out .* exp(-1i*angle(rf_out(1)));
     
     tmp = A*rf_out;
     mcomp = embed(tmp,squeeze(mask));
@@ -92,7 +91,7 @@
     %% Null detection
 
     % This can be done better with adv image processing
-    b1Threshold = 0.2;
+    b1Threshold = 0.15;
     if ~isempty(A)
         tmpM = abs(A*rf_out);
         fdFlag = (sum((tmpM<b1Threshold) & (tmpM>0))>1);
@@ -110,7 +109,7 @@
         end
 
 %         [tmpRF,err,phs,errSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFlag,0.08,1,mask,B1p);
-        [tmpRF,err,phs,errSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFlag,0.20,150,mask,B1p);
+        [tmpRF,err,phs,errSE,errSAR] = shimMSfun2(A,phs,beta,betaCtr,fdFlag,0.15,150,mask,B1p);
         
         rf2(:,betaCtr) = tmpRF;
         
@@ -136,6 +135,11 @@
     
     %% Select Shim Result for export and compare
     rf_out = rf2(:,idxShim);
+    
+    % Adjust the overall flip angle of each slice for the output solution
+    rf_out = rf_out / mean(abs(A*rf_out));        
+    % Normalize by the 1st channel shim phase.
+    rf_out = rf_out .* exp(-1i*angle(rf_out(1)));
     
     tmp = A*rf_out;
     mcomp = embed(tmp,squeeze(mask));
